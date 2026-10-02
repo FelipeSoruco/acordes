@@ -26,7 +26,7 @@ h1{font:700 clamp(28px,5vw,40px)/1.05 var(--display);margin:0;letter-spacing:-.0
 h2{font:700 13px/1 var(--display);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:0}
 label,legend{font-weight:500}
 fieldset{border:0;margin:0;padding:0;display:grid;gap:8px;min-width:0}
-input[type=url]{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px}
+input[type=url],input[type=text]{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px}
 input[type=file]{width:100%;font:inherit;color:var(--ink)}
 button{font:500 14px var(--body);border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:9px 14px;cursor:pointer}
 button.ghost{background:transparent;color:var(--accent)}
@@ -82,6 +82,12 @@ h3{font:700 13px/1 var(--display);text-transform:uppercase;letter-spacing:.09em;
     <div style="display:grid;gap:20px;min-width:0">
       <section class="panel" aria-labelledby="h-audio">
         <h2 id="h-audio">1 · Canción</h2>
+        <div id="ask" class="yt" hidden>
+          <label for="q">Canción y artista</label>
+          <input type="text" id="q" placeholder="Ej.: Stand By Me, Ben E. King" autocomplete="off">
+          <div class="row"><button id="ask-btn" disabled>Buscar acordes</button></div>
+          <p class="hint" id="ask-msg">Claude escribe los acordes de memoria, sin escuchar la canción. Pueden tener errores: compáralos al oído.</p>
+        </div>
         <div id="yt" class="yt" hidden>
           <label for="url">Enlace de YouTube</label>
           <input type="url" id="url" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off">
@@ -579,6 +585,35 @@ $("detect-yt").addEventListener("click", () => {
 });
 // el bloque de YouTube solo aparece si la página se sirve desde web/serve.py
 fetch("/api/health").then((r) => r.ok && r.text()).then((t) => { if (t === "ok") $("yt").hidden = false; }).catch(() => {});
+
+
+// Por título: le pide a Claude (capacidad "sample") los acordes escritos de memoria
+(async () => {
+  const sample = window.claude && (await window.claude.use("sample").catch(() => null));
+  if (!sample) return;
+  $("ask").hidden = false;
+  $("q").addEventListener("input", () => { $("ask-btn").disabled = !$("q").value.trim(); });
+  $("ask-btn").addEventListener("click", async () => {
+    const q = $("q").value.trim(), msg = $("ask-msg"), btn = $("ask-btn");
+    btn.disabled = true; msg.textContent = "Claude está escribiendo los acordes…";
+    const prompt = `Escribe los acordes de guitarra de la canción "${q}", en su tonalidad original y con la estructura completa (estrofas, estribillo, puente).
+Formato, y nada más que esto:
+- Primera línea: "# Título - Artista".
+- Una línea por sección con comentario "# Estrofa", "# Estribillo"...
+- Después compases separados por "|", cuatro compases por línea, un acorde o más por compás (por ejemplo "| Am | F C | G | G |").
+- Usa nombres simples: C, Am, G7, Dm7, Fmaj7, Bb, F#m, Dsus4, G/B.
+Si no conoces la canción con suficiente seguridad para escribir su progresión real, responde solo: DESCONOCIDA. No inventes una progresión genérica.`;
+    try {
+      const out = (await sample(prompt, { modelTier: "complex", cache: false })).text.trim().replace(/^```\w*\n?|```$/g, "").trim();
+      if (/^DESCONOCIDA/i.test(out)) { msg.textContent = "Claude no conoce esa canción con seguridad. Prueba con otro título o escribe los acordes a mano."; return; }
+      parseTextChart(out, +$("bpb").value);  // valida el formato
+      $("chords").value = out; title = ""; tempo = null; render();
+      msg.textContent = "Acordes escritos de memoria por Claude, sin escuchar la canción: compáralos al oído.";
+    } catch (e) {
+      msg.textContent = e.code === "not_granted" ? "Necesitas permitir que la página consulte a Claude." : "No se pudo obtener una respuesta válida. Inténtalo de nuevo.";
+    } finally { btn.disabled = !$("q").value.trim(); }
+  });
+})();
 
 $("chords").value = SAMPLE;
 render();
