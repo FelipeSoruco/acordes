@@ -326,4 +326,27 @@ async function detectChords(samples, sr, beatsPerBar = 4, onProgress) {
   return { beats: chords, tempo, beatsPerBar };
 }
 
-if (typeof module !== "undefined") module.exports = { analyze, estimateBeats, parseChord, parseTextChart, chartToText, simplify, bestShape, candidateShapes, chordName, detectChords, viterbiChords, chord };
+/* ---------- importar una cifra pegada (acordes sobre la letra) ---------- */
+function importCifra(text) {
+  const out = [], pending = [];
+  const flush = () => {
+    for (let i = 0; i < pending.length; i += 4) out.push("| " + pending.slice(i, i + 4).join(" | ") + " |");
+    pending.length = 0;
+  };
+  for (const raw of text.split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    const sec = /^\[([^\]]+)\]/.exec(line) || /^(intro|verso|estrofa|refr[aã]o|coro|estribillo|ponte|puente|solo|final|outro|pre-?coro)\b[^a-z]*$/i.exec(line);
+    if (sec) { flush(); out.push("# " + sec[1].trim()); continue; }
+    if (/^(tom|capo|cejilla|afina)/i.test(line)) continue;
+    const tokens = line.replace(/[|()\[\]]/g, " ").replace(/\b\d+\s*x\b|\bx\s*\d+\b/gi, " ").split(/\s+/).filter(Boolean);
+    if (!tokens.length) continue;
+    try { for (const t of tokens) parseChord(t); } catch { continue; }  // línea de letra
+    pending.push(...tokens);
+  }
+  flush();
+  if (!out.some((l) => l.startsWith("|"))) throw new Error("No encontré acordes en el texto pegado.");
+  return out.join("\n");
+}
+
+if (typeof module !== "undefined") module.exports = { importCifra, analyze, estimateBeats, parseChord, parseTextChart, chartToText, simplify, bestShape, candidateShapes, chordName, detectChords, viterbiChords, chord };

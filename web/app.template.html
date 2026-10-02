@@ -105,6 +105,8 @@ h3{font:700 13px/1 var(--display);text-transform:uppercase;letter-spacing:.09em;
         <label for="chords" class="hint">Compases separados por <code>|</code>. Los acordes de un compás se reparten por igual.</label>
         <textarea id="chords" spellcheck="false"></textarea>
         <p class="err" id="err" role="alert"></p>
+        <div class="row"><button class="ghost" id="import" type="button">Convertir cifra pegada</button>
+          <span class="hint">Pega la cifra de Cifra Club u otro sitio (acordes sobre la letra) y pulsa aquí.</span></div>
         <div class="row"><label for="bpb">Beats por compás</label>
           <select id="bpb"><option>4</option><option>3</option><option>2</option><option>6</option></select></div>
       </section>
@@ -202,6 +204,10 @@ function render() {
   };
 }
 
+$("import").addEventListener("click", () => {
+  try { $("chords").value = importCifra($("chords").value); tempo = null; title = ""; render(); }
+  catch (e) { $("err").textContent = e.message; }
+});
 let timer;
 const rerender = () => { clearTimeout(timer); timer = setTimeout(render, 120); };
 $("chords").addEventListener("input", () => { tempo = null; rerender(); });

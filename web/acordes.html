@@ -105,6 +105,8 @@ h3{font:700 13px/1 var(--display);text-transform:uppercase;letter-spacing:.09em;
         <label for="chords" class="hint">Compases separados por <code>|</code>. Los acordes de un compás se reparten por igual.</label>
         <textarea id="chords" spellcheck="false"></textarea>
         <p class="err" id="err" role="alert"></p>
+        <div class="row"><button class="ghost" id="import" type="button">Convertir cifra pegada</button>
+          <span class="hint">Pega la cifra de Cifra Club u otro sitio (acordes sobre la letra) y pulsa aquí.</span></div>
         <div class="row"><label for="bpb">Beats por compás</label>
           <select id="bpb"><option>4</option><option>3</option><option>2</option><option>6</option></select></div>
       </section>
@@ -454,6 +456,29 @@ async function detectChords(samples, sr, beatsPerBar = 4, onProgress) {
   return { beats: chords, tempo, beatsPerBar };
 }
 
+/* ---------- importar una cifra pegada (acordes sobre la letra) ---------- */
+function importCifra(text) {
+  const out = [], pending = [];
+  const flush = () => {
+    for (let i = 0; i < pending.length; i += 4) out.push("| " + pending.slice(i, i + 4).join(" | ") + " |");
+    pending.length = 0;
+  };
+  for (const raw of text.split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    const sec = /^\[([^\]]+)\]/.exec(line) || /^(intro|verso|estrofa|refr[aã]o|coro|estribillo|ponte|puente|solo|final|outro|pre-?coro)\b[^a-z]*$/i.exec(line);
+    if (sec) { flush(); out.push("# " + sec[1].trim()); continue; }
+    if (/^(tom|capo|cejilla|afina)/i.test(line)) continue;
+    const tokens = line.replace(/[|()\[\]]/g, " ").replace(/\b\d+\s*x\b|\bx\s*\d+\b/gi, " ").split(/\s+/).filter(Boolean);
+    if (!tokens.length) continue;
+    try { for (const t of tokens) parseChord(t); } catch { continue; }  // línea de letra
+    pending.push(...tokens);
+  }
+  flush();
+  if (!out.some((l) => l.startsWith("|"))) throw new Error("No encontré acordes en el texto pegado.");
+  return out.join("\n");
+}
+
 
 </script>
 <script>
@@ -530,6 +555,10 @@ function render() {
   };
 }
 
+$("import").addEventListener("click", () => {
+  try { $("chords").value = importCifra($("chords").value); tempo = null; title = ""; render(); }
+  catch (e) { $("err").textContent = e.message; }
+});
 let timer;
 const rerender = () => { clearTimeout(timer); timer = setTimeout(render, 120); };
 $("chords").addEventListener("input", () => { tempo = null; rerender(); });
