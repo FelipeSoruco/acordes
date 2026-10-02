@@ -26,6 +26,7 @@ h1{font:700 clamp(28px,5vw,40px)/1.05 var(--display);margin:0;letter-spacing:-.0
 h2{font:700 13px/1 var(--display);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:0}
 label,legend{font-weight:500}
 fieldset{border:0;margin:0;padding:0;display:grid;gap:8px;min-width:0}
+input[type=url]{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px}
 input[type=file]{width:100%;font:inherit;color:var(--ink)}
 button{font:500 14px var(--body);border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:9px 14px;cursor:pointer}
 button.ghost{background:transparent;color:var(--accent)}
@@ -68,6 +69,7 @@ h3{font:700 13px/1 var(--display);text-transform:uppercase;letter-spacing:.09em;
 .dg .bar-d{fill:var(--accent)}
 .dg text{fill:var(--ink);font:500 10px var(--mono);text-anchor:middle}
 .dg text.fn{fill:var(--muted);text-anchor:start}
+.yt{display:grid;gap:8px}
 .placeholder{color:var(--muted)}
 </style>
 
@@ -80,6 +82,13 @@ h3{font:700 13px/1 var(--display);text-transform:uppercase;letter-spacing:.09em;
     <div style="display:grid;gap:20px;min-width:0">
       <section class="panel" aria-labelledby="h-audio">
         <h2 id="h-audio">1 · Canción</h2>
+        <div id="yt" class="yt" hidden>
+          <label for="url">Enlace de YouTube</label>
+          <input type="url" id="url" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off">
+          <div class="row"><button id="detect-yt" disabled>Detectar desde YouTube</button></div>
+          <p class="hint">Hasta 10 minutos. Usa solo música que tengas derecho a descargar.</p>
+        </div>
+        <label for="file">Archivo de audio</label>
         <input type="file" id="file" accept="audio/*" aria-label="Archivo de audio">
         <div class="row"><button id="detect" disabled>Detectar acordes</button><span class="hint" id="detect-msg">Todo se procesa en tu navegador.</span></div>
         <progress id="prog" max="1" value="0" hidden></progress>
@@ -523,14 +532,15 @@ $("capo").addEventListener("change", render);
 document.querySelectorAll("input[name=lvl]").forEach((el) => el.addEventListener("change", render));
 
 $("file").addEventListener("change", () => { $("detect").disabled = !$("file").files.length; });
-$("detect").addEventListener("click", async () => {
-  const file = $("file").files[0];
-  if (!file) return;
+async function runDetect(getBytes, name, buttons) {
   const msg = $("detect-msg"), prog = $("prog");
-  $("detect").disabled = true; prog.hidden = false; prog.value = 0; msg.textContent = "Leyendo audio…";
+  buttons.forEach((b) => (b.disabled = true)); prog.hidden = false; prog.value = 0;
   try {
+    msg.textContent = "Obteniendo audio…";
+    const bytes = await getBytes();
+    msg.textContent = "Leyendo audio…";
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const buf = await ctx.decodeAudioData(await file.arrayBuffer());
+    const buf = await ctx.decodeAudioData(bytes);
     ctx.close && ctx.close();
     const sr = 11025, dur = Math.min(buf.duration, 480);
     const off = new OfflineAudioContext(1, Math.ceil(dur * sr), sr);
@@ -540,17 +550,35 @@ $("detect").addEventListener("click", async () => {
     msg.textContent = "Analizando acordes…";
     const bpb = +$("bpb").value;
     const res = await detectChords(samples, sr, bpb, (p) => { prog.value = p; });
-    tempo = res.tempo;
-    title = file.name.replace(/\.[^.]+$/, "");
+    title = name;
     $("chords").value = chartToText(res.beats, bpb, title);
-    msg.textContent = dur < buf.duration ? "Listo (primeros 8 minutos)." : "Listo. Revisa y corrige los acordes.";
-    render();
     tempo = res.tempo; render();
+    msg.textContent = dur < buf.duration ? "Listo (primeros 8 minutos)." : "Listo. Revisa y corrige los acordes.";
   } catch (e) {
-    msg.textContent = "No se pudo leer ese archivo de audio.";
+    msg.textContent = e.userMessage || "No se pudo leer ese audio.";
     console.error(e);
-  } finally { prog.hidden = true; $("detect").disabled = false; }
+  } finally { prog.hidden = true; refreshButtons(); }
+}
+function refreshButtons() {
+  $("detect").disabled = !$("file").files.length;
+  $("detect-yt").disabled = !$("url").value.trim();
+}
+$("file").addEventListener("change", refreshButtons);
+$("url").addEventListener("input", refreshButtons);
+$("detect").addEventListener("click", () => {
+  const file = $("file").files[0];
+  runDetect(() => file.arrayBuffer(), file.name.replace(/\.[^.]+$/, ""), [$("detect"), $("detect-yt")]);
 });
+$("detect-yt").addEventListener("click", () => {
+  const url = $("url").value.trim();
+  runDetect(async () => {
+    const r = await fetch("/api/audio?url=" + encodeURIComponent(url));
+    if (!r.ok) { const e = new Error(); e.userMessage = await r.text(); throw e; }
+    return r.arrayBuffer();
+  }, "YouTube", [$("detect"), $("detect-yt")]);
+});
+// el bloque de YouTube solo aparece si la página se sirve desde web/serve.py
+fetch("/api/health").then((r) => r.ok && r.text()).then((t) => { if (t === "ok") $("yt").hidden = false; }).catch(() => {});
 
 $("chords").value = SAMPLE;
 render();

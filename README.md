@@ -22,3 +22,14 @@ Formato de texto: compases separados por `|`; los acordes de un compás se repar
 
 Pipeline: `detect.py` (chroma CQT sincronizado a beats + Viterbi) → `simplify.py` → `shapes.py` / `render.py`.
 Limitaciones: asume compás fijo (`--compas`), sin detección de bajo/inversiones ni de tonalidad.
+
+## Versión web
+
+`web/acordes.html` es una página autocontenida (detección y simplificación en el navegador; se regenera con `python web/build.py`).
+
+Para usar un enlace de YouTube hace falta el servidor local, que descarga el audio:
+
+```bash
+pip install yt-dlp        # y tener ffmpeg instalado
+python web/serve.py       # abre http://127.0.0.1:8765
+```
