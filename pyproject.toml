@@ -1,0 +1,18 @@
+[project]
+name = "acordes"
+version = "0.1.0"
+description = "Genera una versión en guitarra (acordes simplificables) de una canción"
+requires-python = ">=3.10"
+dependencies = ["numpy", "librosa", "soundfile"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+acordes = "acordes.cli:main"
+
+[tool.setuptools]
+packages = ["acordes"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
