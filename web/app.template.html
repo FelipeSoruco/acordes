@@ -1,0 +1,229 @@
+<title>Acordes para guitarra</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+/* Una hoja de trabajo: entrada a la izquierda, partitura de acordes a la derecha; acento verde-azulado, latón para la cejilla */
+:root{
+  --bg:#edf0ed; --surface:#fbfcfb; --ink:#15201d; --muted:#586761; --line:#cdd6d1;
+  --accent:#0d6e66; --accent-ink:#ffffff; --brass:#8a5a0b; --brass-bg:#f3e7cc; --bad:#a3262a;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1715; --surface:#16211e; --ink:#e6eeea; --muted:#93a39c; --line:#2b3a35;
+  --accent:#4fc3b7; --accent-ink:#06201c; --brass:#e1b45e; --brass-bg:#33280f; --bad:#ff8a8d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1715; --surface:#16211e; --ink:#e6eeea; --muted:#93a39c; --line:#2b3a35;
+  --accent:#4fc3b7; --accent-ink:#06201c; --brass:#e1b45e; --brass-bg:#33280f; --bad:#ff8a8d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);padding-inline:16px;padding-block:24px 48px}
+main{max-width:1080px;margin:0 auto;display:grid;gap:20px}
+h1{font:700 clamp(28px,5vw,40px)/1.05 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.lead{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.layout{display:grid;gap:20px;grid-template-columns:minmax(0,340px) minmax(0,1fr);align-items:start}
+@media (max-width:820px){.layout{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px;min-width:0}
+h2{font:700 13px/1 var(--display);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:0}
+label,legend{font-weight:500}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:8px;min-width:0}
+input[type=file]{width:100%;font:inherit;color:var(--ink)}
+button{font:500 14px var(--body);border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:9px 14px;cursor:pointer}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+textarea{width:100%;min-height:190px;resize:vertical;font:500 14px/1.6 var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:10px}
+select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:6px 8px}
+.seg{display:grid;gap:6px}
+.seg label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:7px;padding:8px 10px;cursor:pointer;font-weight:400}
+.seg label small{display:block;color:var(--muted)}
+.seg input{margin-top:4px;accent-color:var(--accent)}
+.seg label:has(input:checked){border-color:var(--accent);background:var(--bg)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:13px;margin:0}
+.err{color:var(--bad);font-size:13px;margin:0;min-height:1em}
+progress{width:100%;height:6px;accent-color:var(--accent)}
+.summary{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+.stat{border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-width:0}
+.stat b{display:block;font:700 20px/1.2 var(--display)}
+.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.stat.capo{background:var(--brass-bg);border-color:var(--brass)}
+.stat.capo b{color:var(--brass)}
+.meter{display:block;width:120px;height:6px;border-radius:3px;background:var(--line);margin-top:6px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent)}
+.bars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--ink);border-left:1px solid var(--line)}
+@media (max-width:600px){.bars{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bar{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 8px;display:flex;gap:4px;font:600 17px var(--mono);min-height:46px;align-items:center;flex-wrap:wrap}
+.bar .c{flex:1 1 0;min-width:2.6ch}
+.bar .t{color:var(--line);flex:1 1 0}
+.bar.first{box-shadow:inset 3px 0 0 var(--accent)}
+h3{font:700 13px/1 var(--display);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:8px 0 0}
+.diagrams{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:12px}
+.dg{display:grid;justify-items:center;gap:2px;font:600 14px var(--mono)}
+.dg svg{width:84px;height:auto;display:block}
+.dg small{color:var(--muted);font:400 11px var(--body)}
+.dg .st{stroke:var(--ink);stroke-width:1}
+.dg .fr{stroke:var(--line);stroke-width:1}
+.dg .nut{stroke:var(--ink);stroke-width:3}
+.dg .dot{fill:var(--accent)}
+.dg .bar-d{fill:var(--accent)}
+.dg text{fill:var(--ink);font:500 10px var(--mono);text-anchor:middle}
+.dg text.fn{fill:var(--muted);text-anchor:start}
+.placeholder{color:var(--muted)}
+</style>
+
+<main>
+  <header>
+    <h1>Acordes para guitarra</h1>
+    <p class="lead">Sube una canción, detecta los acordes y obtén una versión fácil de tocar, con la cejilla que la deja más sencilla.</p>
+  </header>
+  <div class="layout">
+    <div style="display:grid;gap:20px;min-width:0">
+      <section class="panel" aria-labelledby="h-audio">
+        <h2 id="h-audio">1 · Canción</h2>
+        <input type="file" id="file" accept="audio/*" aria-label="Archivo de audio">
+        <div class="row"><button id="detect" disabled>Detectar acordes</button><span class="hint" id="detect-msg">Todo se procesa en tu navegador.</span></div>
+        <progress id="prog" max="1" value="0" hidden></progress>
+        <p class="hint">Funciona mejor con guitarra o piano y tempo estable. Si falla algún acorde, corrígelo abajo.</p>
+      </section>
+      <section class="panel" aria-labelledby="h-chords">
+        <h2 id="h-chords">2 · Acordes</h2>
+        <label for="chords" class="hint">Compases separados por <code>|</code>. Los acordes de un compás se reparten por igual.</label>
+        <textarea id="chords" spellcheck="false"></textarea>
+        <p class="err" id="err" role="alert"></p>
+        <div class="row"><label for="bpb">Beats por compás</label>
+          <select id="bpb"><option>4</option><option>3</option><option>2</option><option>6</option></select></div>
+      </section>
+      <section class="panel">
+        <h2 id="h-lvl">3 · Dificultad</h2>
+        <fieldset class="seg" aria-labelledby="h-lvl">
+          <label><input type="radio" name="lvl" value="1"><span>Muy fácil<small>Solo mayores y menores</small></span></label>
+          <label><input type="radio" name="lvl" value="2" checked><span>Fácil<small>Conserva las séptimas</small></span></label>
+          <label><input type="radio" name="lvl" value="3"><span>Completo<small>Todos los acordes detectados</small></span></label>
+        </fieldset>
+        <label class="row" style="gap:8px;font-weight:400"><input type="checkbox" id="capo" checked style="accent-color:var(--accent)"> Proponer cejilla</label>
+      </section>
+    </div>
+    <section class="panel" aria-live="polite" aria-labelledby="h-out">
+      <h2 id="h-out">Tu versión</h2>
+      <div id="out" class="placeholder">Escribe o detecta acordes para ver la versión.</div>
+    </section>
+  </div>
+</main>
+
+<script>
+/*ENGINE*/
+</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const SAMPLE = "# Demo\n| Bbmaj7 | Gm7 | Ebmaj7 | F7sus4 F |\n| Bbmaj7 | Gm7 | Cm7 F7 | Bb |";
+let tempo = null, title = "";
+
+function diagramSVG(shape) {
+  const frets = shape.frets, played = frets.filter((f) => f > 0);
+  const maxF = Math.max(0, ...played), minF = played.length ? Math.min(...played) : 1;
+  const top = maxF <= 5 ? 1 : minF, rows = 5;
+  const x0 = 14, dx = 11, y0 = 22, dy = 14;
+  let s = `<svg viewBox="0 0 84 102" role="img" aria-label="${chordName(shape.chord)}">`;
+  for (let i = 0; i < 6; i++) s += `<line class="st" x1="${x0 + i * dx}" y1="${y0}" x2="${x0 + i * dx}" y2="${y0 + rows * dy}"/>`;
+  for (let r = 0; r <= rows; r++) s += `<line class="${r === 0 && top === 1 ? "nut" : "fr"}" x1="${x0}" y1="${y0 + r * dy}" x2="${x0 + 5 * dx}" y2="${y0 + r * dy}"/>`;
+  if (top > 1) s += `<text class="fn" x="${x0 + 5 * dx + 5}" y="${y0 + dy * 0.7}">${top}</text>`;
+  frets.forEach((f, i) => {
+    const x = x0 + i * dx;
+    if (f === null) s += `<text x="${x}" y="${y0 - 8}">×</text>`;
+    else if (f === 0) s += `<circle cx="${x}" cy="${y0 - 11}" r="3" fill="none" stroke="currentColor" style="stroke:var(--ink)"/>`;
+  });
+  if (shape.barre) {
+    const base = Math.min(...played), idx = frets.map((f, i) => (f === base ? i : -1)).filter((i) => i >= 0);
+    const y = y0 + (base - top + 0.5) * dy;
+    s += `<rect class="bar-d" x="${x0 + idx[0] * dx - 4}" y="${y - 4.5}" width="${(idx[idx.length - 1] - idx[0]) * dx + 8}" height="9" rx="4.5"/>`;
+  }
+  frets.forEach((f, i) => { if (f > 0) s += `<circle class="dot" cx="${x0 + i * dx}" cy="${y0 + (f - top + 0.5) * dy}" r="4.6"/>`; });
+  return s + "</svg>";
+}
+
+function barsHTML(beats, bpb) {
+  let html = "";
+  for (let i = 0; i < beats.length; i += bpb) {
+    let prev, cells = "";
+    for (const c of beats.slice(i, i + bpb)) {
+      cells += sameChord(c, prev) && prev !== undefined ? `<span class="t">·</span>` : `<span class="c">${c ? chordName(c) : "N.C."}</span>`;
+      prev = c;
+    }
+    html += `<div class="bar${i % (bpb * 4) === 0 ? " first" : ""}">${cells}</div>`;
+  }
+  return `<div class="bars">${html}</div>`;
+}
+
+let lastText = "";
+function render() {
+  const bpb = +$("bpb").value, level = +document.querySelector('input[name=lvl]:checked').value;
+  let chart;
+  try {
+    chart = parseTextChart($("chords").value, bpb);
+    $("err").textContent = "";
+  } catch (e) { $("err").textContent = e.message; return; }
+  if (!chart.beats.length) { $("out").className = "placeholder"; $("out").textContent = "Escribe o detecta acordes para ver la versión."; return; }
+  const r = simplify(chart.beats, level, $("capo").checked);
+  const seen = [];
+  for (const c of r.beats) if (c && !seen.some((s) => sameChord(s, c))) seen.push(c);
+  const pct = Math.min(100, Math.round(((r.difficulty - 1) / 2.5) * 100));
+  const label = r.difficulty < 1.6 ? "Abiertos" : r.difficulty < 2.4 ? "Algo de cejilla" : "Con cejillas";
+  lastText = `${chart.title || title || "Versión para guitarra"}\nCejilla: ${r.capo ? "traste " + r.capo : "sin cejilla"}\n\n` + chartToText(r.beats, bpb);
+  $("out").className = "";
+  $("out").innerHTML = `
+    <div class="summary">
+      <div class="stat capo"><span>Cejilla</span><b>${r.capo ? "Traste " + r.capo : "Sin cejilla"}</b></div>
+      <div class="stat"><span>Dificultad</span><b>${label}</b><i class="meter"><i style="width:${Math.max(6, pct)}%"></i></i></div>
+      ${tempo ? `<div class="stat"><span>Tempo</span><b>${Math.round(tempo)} bpm</b></div>` : ""}
+    </div>
+    <p class="hint">${r.capo ? "Toca estas formas con la cejilla puesta: el sonido es el de la canción original." : "Estas formas suenan como la canción original."}</p>
+    ${barsHTML(r.beats, bpb)}
+    <h3>Formas de acorde</h3>
+    <div class="diagrams">${seen.map((c) => { const sh = bestShape(c); return `<div class="dg"><span>${chordName(c)}</span>${diagramSVG(sh)}<small>${sh.barre ? "cejilla" : "abierto"}</small></div>`; }).join("")}</div>
+    <div class="row"><button class="ghost" id="copy">Copiar acordes</button><span class="hint" id="copied"></span></div>`;
+  $("copy").onclick = async () => {
+    try { await navigator.clipboard.writeText(lastText); $("copied").textContent = "Copiado"; }
+    catch { $("copied").textContent = "No se pudo copiar; selecciona el texto manualmente."; }
+  };
+}
+
+let timer;
+const rerender = () => { clearTimeout(timer); timer = setTimeout(render, 120); };
+$("chords").addEventListener("input", () => { tempo = null; rerender(); });
+$("bpb").addEventListener("change", render);
+$("capo").addEventListener("change", render);
+document.querySelectorAll("input[name=lvl]").forEach((el) => el.addEventListener("change", render));
+
+$("file").addEventListener("change", () => { $("detect").disabled = !$("file").files.length; });
+$("detect").addEventListener("click", async () => {
+  const file = $("file").files[0];
+  if (!file) return;
+  const msg = $("detect-msg"), prog = $("prog");
+  $("detect").disabled = true; prog.hidden = false; prog.value = 0; msg.textContent = "Leyendo audio…";
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = await ctx.decodeAudioData(await file.arrayBuffer());
+    ctx.close && ctx.close();
+    const sr = 11025, dur = Math.min(buf.duration, 480);
+    const off = new OfflineAudioContext(1, Math.ceil(dur * sr), sr);
+    const src = off.createBufferSource();
+    src.buffer = buf; src.connect(off.destination); src.start(0, 0, dur);
+    const samples = (await off.startRendering()).getChannelData(0);
+    msg.textContent = "Analizando acordes…";
+    const bpb = +$("bpb").value;
+    const res = await detectChords(samples, sr, bpb, (p) => { prog.value = p; });
+    tempo = res.tempo;
+    title = file.name.replace(/\.[^.]+$/, "");
+    $("chords").value = chartToText(res.beats, bpb, title);
+    msg.textContent = dur < buf.duration ? "Listo (primeros 8 minutos)." : "Listo. Revisa y corrige los acordes.";
+    render();
+    tempo = res.tempo; render();
+  } catch (e) {
+    msg.textContent = "No se pudo leer ese archivo de audio.";
+    console.error(e);
+  } finally { prog.hidden = true; $("detect").disabled = false; }
+});
+
+$("chords").value = SAMPLE;
+render();
+</script>
